@@ -122,7 +122,22 @@ class _SettingsDialogState extends State<SettingsDialog> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Theme Selection
+                  // 1. Audio Sound Toggle
+                  const Text(
+                    'AUDIO SOUND',
+                    style: TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  _buildSoundPills(),
+
+                  const SizedBox(height: 16),
+
+                  // 2. Theme Selection
                   const Text(
                     'MAP THEME',
                     style: TextStyle(
@@ -135,9 +150,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   const SizedBox(height: 6),
                   _buildThemePills(c),
 
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 16),
 
-                  // 2. Player Name
+                  // 3. Player Name
                   const Text(
                     'PLAYER HERO NAME',
                     style: TextStyle(
@@ -150,9 +165,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   const SizedBox(height: 6),
                   _buildNameInput(c),
 
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 16),
 
-                  // 3. Country Faction
+                  // 4. Country Faction
                   const Text(
                     'FACTION & SPECIAL PERK',
                     style: TextStyle(
@@ -165,7 +180,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   const SizedBox(height: 6),
                   _buildCountryDropdown(c),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 22),
 
                   // Done Button
                   SizedBox(
@@ -199,6 +214,114 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSoundPills() {
+    final isEnabled = GameAudio.isSoundEnabled;
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF334155), width: 1.5),
+      ),
+      child: Row(
+        children: [
+          // SOUND ON
+          Expanded(
+            child: InkWell(
+              onTap: () async {
+                await GameAudio.setSoundEnabled(true);
+                setState(() {});
+              },
+              borderRadius: BorderRadius.circular(10),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: isEnabled
+                      ? const LinearGradient(
+                          colors: [Color(0xFF10B981), Color(0xFF059669)],
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: isEnabled
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFF10B981).withValues(alpha: 0.4),
+                            blurRadius: 8,
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('🔊', style: TextStyle(fontSize: 15)),
+                    const SizedBox(width: 6),
+                    Text(
+                      'SOUND ON',
+                      style: TextStyle(
+                        color: isEnabled ? Colors.white : const Color(0xFF94A3B8),
+                        fontSize: 12,
+                        fontWeight: isEnabled ? FontWeight.w800 : FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          // SOUND OFF
+          Expanded(
+            child: InkWell(
+              onTap: () async {
+                await GameAudio.setSoundEnabled(false);
+                setState(() {});
+              },
+              borderRadius: BorderRadius.circular(10),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: !isEnabled
+                      ? const LinearGradient(
+                          colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: !isEnabled
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFFEF4444).withValues(alpha: 0.4),
+                            blurRadius: 8,
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('🔇', style: TextStyle(fontSize: 15)),
+                    const SizedBox(width: 6),
+                    Text(
+                      'SOUND OFF',
+                      style: TextStyle(
+                        color: !isEnabled ? Colors.white : const Color(0xFF94A3B8),
+                        fontSize: 12,
+                        fontWeight: !isEnabled ? FontWeight.w800 : FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

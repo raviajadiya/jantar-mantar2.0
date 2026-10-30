@@ -2,6 +2,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../engine/game_controller.dart';
+import '../engine/game_audio.dart';
 import '../widgets/game_canvas_viewport.dart';
 import '../widgets/hud_top_bar.dart';
 import '../widgets/hud_zoom_widget.dart';
@@ -32,6 +33,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     _controller = widget.controller;
+
+    // Start Gameplay BGM loop
+    GameAudio.playGameplayBgm();
 
     _ticker = createTicker((elapsed) {
       if (_lastElapsed == Duration.zero) {
@@ -91,6 +95,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   }
 
   void _returnToHome() {
+    GameAudio.playHomeBgm();
     _controller.goToHome();
     if (Navigator.canPop(context)) {
       Navigator.pop(context);

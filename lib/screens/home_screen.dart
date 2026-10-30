@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import '../engine/game_controller.dart';
+import '../engine/game_audio.dart';
 import '../widgets/game_canvas_viewport.dart';
 import '../widgets/start_card_dialog.dart';
 import 'game_screen.dart';
@@ -22,6 +23,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void initState() {
     super.initState();
     _controller = GameController();
+
+    // Start Home BGM loop
+    GameAudio.playHomeBgm();
 
     _ticker = createTicker((elapsed) {
       if (_lastElapsed == Duration.zero) {
@@ -54,7 +58,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         builder: (context) => GameScreen(controller: _controller),
       ),
     ).then((_) {
-      // When returning to HomeScreen, reset to home cinematic view
+      // When returning to HomeScreen, resume Home BGM & reset cinematic view
+      GameAudio.playHomeBgm();
       _controller.goToHome();
       setState(() {});
     });

@@ -303,8 +303,7 @@ class GameController extends ChangeNotifier {
   void triggerVictory() {
     isGameOver = true;
     isVictory = true;
-    GameAudio.playBlastPop();
-    GameAudio.playFanfare();
+    GameAudio.playNextLevelSound();
     spawnCelebrationBlast(camera.viewportWidth / 2, camera.viewportHeight / 2);
     notifyListeners();
   }
@@ -314,6 +313,7 @@ class GameController extends ChangeNotifier {
     isArrested = true;
     arrestingOfficer = officer;
     GameAudio.playPoliceSiren();
+    GameAudio.playGameOverBgm();
     notifyListeners();
   }
 
