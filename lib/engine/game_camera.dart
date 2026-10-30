@@ -9,13 +9,13 @@ class GameCamera {
   double worldWidth;
   double worldHeight;
 
-  double x = 1800.0;
-  double y = 1800.0;
-  double targetX = 1800.0;
-  double targetY = 1800.0;
+  double x = 1640.0;
+  double y = 1640.0;
+  double targetX = 1640.0;
+  double targetY = 1640.0;
 
-  double zoom = 0.45;
-  double targetZoom = 0.45;
+  double zoom = 0.52;
+  double targetZoom = 0.52;
   final double minZoom = GameConfig.minZoom;
   final double maxZoom = GameConfig.maxZoom;
 
@@ -90,8 +90,17 @@ class GameCamera {
     final halfVW = (viewportWidth / 2) / zoom;
     final halfVH = (viewportHeight / 2) / zoom;
 
-    x = math.max(halfVW, math.min(worldWidth - halfVW, x));
-    y = math.max(halfVH, math.min(worldHeight - halfVH, y));
+    if (worldWidth > halfVW * 2) {
+      x = math.max(halfVW, math.min(worldWidth - halfVW, x));
+    } else {
+      x = worldWidth / 2;
+    }
+
+    if (worldHeight > halfVH * 2) {
+      y = math.max(halfVH, math.min(worldHeight - halfVH, y));
+    } else {
+      y = worldHeight / 2;
+    }
   }
 
   Offset screenToWorld(double screenX, double screenY) {

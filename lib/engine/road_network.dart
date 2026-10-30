@@ -30,18 +30,18 @@ class RoadNetwork {
     segments.clear();
     _nodeIdCounter = 0;
 
+    // Fixed, perfectly proportioned 5-ring circular city layout
+    rings = [220.0, 460.0, 720.0, 980.0, 1260.0];
+    final maxRingIdx = rings.length - 1;
+
+    final maxR = rings.last;
+    final worldSize = (maxR + 380.0) * 2; // 3280.0
+    center = Offset(worldSize / 2, worldSize / 2);
+
     final cx = center.dx;
     final cy = center.dy;
 
-    final extraRings = currentLevel ~/ 5;
-    final List<double> base = [240.0, 480.0, 760.0, 1080.0, 1400.0];
-    rings = List<double>.from(base);
-    for (int i = 1; i <= extraRings; i++) {
-      rings.add(1400.0 + i * 320.0);
-    }
-    final maxRingIdx = rings.length - 1;
-
-    // 16 Radials
+    // 16 Radial Avenues
     radials = [];
     for (int i = 0; i < 16; i++) {
       radials.add(-math.pi / 2 + (i * math.pi) / 8);
@@ -60,29 +60,18 @@ class RoadNetwork {
       ));
     }
 
-    // 8 Main Radial Avenues from Ring 0 to outermost
-    for (int a = 0; a < numRadials; a += 2) {
+    // 2. Segments: 16 Radial Avenues from Ring 0 / Ring 1 to outermost Ring
+    for (int a = 0; a < numRadials; a++) {
       final angle = radials[a];
+      final startR = (a % 2 == 0) ? rings[0] : rings[1];
       segments.add(RoadSegment.line(
-        x1: cx + math.cos(angle) * rings[0],
-        y1: cy + math.sin(angle) * rings[0],
+        x1: cx + math.cos(angle) * startR,
+        y1: cy + math.sin(angle) * startR,
         x2: cx + math.cos(angle) * (rings[maxRingIdx] + 30),
         y2: cy + math.sin(angle) * (rings[maxRingIdx] + 30),
         width: 90.0,
-        isMain: true,
-      ));
-    }
-
-    // 8 Intermediate Radial Avenues from Ring 2 to outermost
-    for (int a = 1; a < numRadials; a += 2) {
-      final angle = radials[a];
-      segments.add(RoadSegment.line(
-        x1: cx + math.cos(angle) * rings[2],
-        y1: cy + math.sin(angle) * rings[2],
-        x2: cx + math.cos(angle) * (rings[maxRingIdx] + 30),
-        y2: cy + math.sin(angle) * (rings[maxRingIdx] + 30),
-        width: 90.0,
-        isIntermediate: true,
+        isMain: (a % 2 == 0),
+        isIntermediate: (a % 2 != 0),
       ));
     }
 
@@ -107,7 +96,7 @@ class RoadNetwork {
       ));
     }
 
-    // 2. Exact Intersection Nodes Matrix: [ringIdx][radIdx]
+    // 2. Intersection Nodes Matrix: [ringIdx][radIdx]
     final List<List<RoadNode?>> matrix = List.generate(
       rings.length,
       (_) => List<RoadNode?>.filled(numRadials, null),
@@ -115,7 +104,7 @@ class RoadNetwork {
 
     for (int r = 0; r < rings.length; r++) {
       for (int a = 0; a < numRadials; a++) {
-        if (r < 2 && a % 2 != 0) continue;
+        if (r < 1 && a % 2 != 0) continue; // Main spokes only on Ring 0
         final angle = radials[a];
         final node = _createNode(
           cx + math.cos(angle) * rings[r],
@@ -129,7 +118,7 @@ class RoadNetwork {
       }
     }
 
-    // Center Sanctuary Hub Node (Gandhi Victory Cap)
+    // Center Sanctuary Hub Node (Golden Trophy Plaza)
     final cNode = _createNode(cx, cy, true);
     cNode.ringIndex = -1;
     cNode.isIntersection = true;
@@ -161,7 +150,7 @@ class RoadNetwork {
 
     // Connect radially between rings
     for (int a = 0; a < numRadials; a++) {
-      final startR = (a % 2 == 0) ? 0 : 2;
+      final startR = (a % 2 == 0) ? 0 : 1;
       for (int r = startR; r < rings.length - 1; r++) {
         final n1 = matrix[r][a];
         final n2 = matrix[r + 1][a];
@@ -190,8 +179,8 @@ class RoadNetwork {
     // Connect circularly along each ring
     for (int r = 0; r < rings.length; r++) {
       final radius = rings[r];
-      final step = (r < 2) ? 2 : 1;
-      final div = (r < 2) ? 4 : 3;
+      final step = (r < 1) ? 2 : 1;
+      const div = 3;
 
       for (int a = 0; a < numRadials; a += step) {
         final nextA = (a + step) % numRadials;

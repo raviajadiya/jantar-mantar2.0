@@ -20,10 +20,13 @@ class HudTopBar extends StatelessWidget {
 
     return Positioned(
       top: topPadding + 8,
-      left: 16,
-      right: 16,
+      left: 10,
+      right: 10,
       child: Center(
         child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width - 20,
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
             color: const Color(0xF20F172A),
@@ -162,7 +165,7 @@ class HudTopBar extends StatelessWidget {
 
     if (controller.areAllFlagsCollected) {
       return _buildThreatContainer(
-        text: '✨ CLAIM CAP!',
+        text: '✨ CLAIM TROPHY!',
         bgColor: const Color(0xFFB45309),
         borderColor: const Color(0xFFF59E0B),
       );

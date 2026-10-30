@@ -45,31 +45,37 @@ class MapPainter extends CustomPainter {
     for (int rIdx = 0; rIdx < rings.length - 1; rIdx++) {
       final innerR = rings[rIdx] + halfW + 6.0;
       final outerR = rings[rIdx + 1] - halfW - 6.0;
-      if (outerR <= innerR) continue;
+      if (outerR <= innerR + 10.0) continue;
 
       final numSectors = (rIdx < 2) ? 8 : 16;
       final angleStep = (math.pi * 2) / numSectors;
-      final angleMargin = math.max(0.038, 52.0 / outerR);
+
+      final marginInner = 58.0 / innerR;
+      final marginOuter = 58.0 / outerR;
 
       for (int sIdx = 0; sIdx < numSectors; sIdx++) {
         final startRad = -math.pi / 2 + sIdx * angleStep;
         final endRad = startRad + angleStep;
-        final a1 = startRad + angleMargin;
-        final a2 = endRad - angleMargin;
-        if (a2 <= a1) continue;
+
+        final a1Outer = startRad + marginOuter;
+        final a2Outer = endRad - marginOuter;
+        final a1Inner = startRad + marginInner;
+        final a2Inner = endRad - marginInner;
+
+        if (a2Outer <= a1Outer || a2Inner <= a1Inner) continue;
 
         // Shadow path
         final shadowPath = Path()
           ..arcTo(
             Rect.fromCircle(center: center + const Offset(8, 8), radius: outerR),
-            a1,
-            a2 - a1,
+            a1Outer,
+            a2Outer - a1Outer,
             false,
           )
           ..arcTo(
             Rect.fromCircle(center: center + const Offset(8, 8), radius: innerR),
-            a2,
-            a1 - a2,
+            a2Inner,
+            a1Inner - a2Inner,
             false,
           )
           ..close();
@@ -82,14 +88,14 @@ class MapPainter extends CustomPainter {
         final path = Path()
           ..arcTo(
             Rect.fromCircle(center: center, radius: outerR),
-            a1,
-            a2 - a1,
+            a1Outer,
+            a2Outer - a1Outer,
             false,
           )
           ..arcTo(
             Rect.fromCircle(center: center, radius: innerR),
-            a2,
-            a1 - a2,
+            a2Inner,
+            a1Inner - a2Inner,
             false,
           )
           ..close();

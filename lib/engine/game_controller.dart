@@ -73,16 +73,15 @@ class GameController extends ChangeNotifier {
     isConfettiActive = false;
     camera.clearFollow();
     camera.isDragging = false;
-    camera.setZoom(0.45);
+    camera.setZoom(0.52);
 
     // Road network
     roadNetwork.buildGraphForLevel(level);
 
     // World size
     final maxR = roadNetwork.rings.last;
-    final worldSize = math.max(3600.0, (maxR + 420.0) * 2);
-    final newCenter = Offset(worldSize / 2, worldSize / 2);
-    roadNetwork.center = newCenter;
+    final worldSize = (maxR + 380.0) * 2;
+    roadNetwork.center = Offset(worldSize / 2, worldSize / 2);
     camera.setWorldSize(worldSize, worldSize);
 
     // Flags
@@ -95,15 +94,18 @@ class GameController extends ChangeNotifier {
   void _initFlags() {
     flags.clear();
     final count = 4 + currentLevel * 2;
-    final rings = roadNetwork.rings;
-    final radials = roadNetwork.radials;
-    final center = roadNetwork.center;
+
+    final validNodes = roadNetwork.nodes.where((n) {
+      return !n.isCenter && n.ringIndex >= 1 && n.isIntersection;
+    }).toList();
+
+    if (validNodes.isEmpty) return;
+
+    final step = math.max(1, validNodes.length ~/ count);
 
     for (int i = 0; i < count; i++) {
-      int ringIdx = 1 + (i % (rings.length - 1));
-      final radIdx = (i * 3 + 1) % radials.length;
-      final angle = radials[radIdx];
-      final r = rings[ringIdx];
+      final nodeIdx = (i * step + 1) % validNodes.length;
+      final node = validNodes[nodeIdx];
 
       flags.add(FlagItem(
         id: 'flag-lvl$currentLevel-${i + 1}',
@@ -112,8 +114,8 @@ class GameController extends ChangeNotifier {
         color: selectedCountry.color,
         stripeColors: selectedCountry.stripeColors,
         countryEmoji: selectedCountry.emoji,
-        x: center.dx + math.cos(angle) * r,
-        y: center.dy + math.sin(angle) * r,
+        x: node.x,
+        y: node.y,
         pulseOffset: i * 0.65,
       ));
     }
@@ -196,7 +198,7 @@ class GameController extends ChangeNotifier {
     isGameStarted = true;
     camera.moveTo(playerPos.dx, playerPos.dy);
     camera.setFollow(playerPos);
-    camera.setZoom(0.45);
+    camera.setZoom(0.52);
     notifyListeners();
   }
 
@@ -337,7 +339,7 @@ class GameController extends ChangeNotifier {
     confettiParticles.clear();
     camera.clearFollow();
     camera.isDragging = false;
-    camera.setZoom(0.45);
+    camera.setZoom(0.52);
     _initLevel(1);
     _spawnPlayerOnOuterRing();
     GameAudio.playHomeBgm();
@@ -680,7 +682,7 @@ class GameController extends ChangeNotifier {
     camera.isDragging = false;
     camera.moveTo(playerPos.dx, playerPos.dy);
     camera.setFollow(playerPos);
-    camera.setZoom(0.45);
+    camera.setZoom(0.52);
     closeZoomDropdown();
     notifyListeners();
   }
