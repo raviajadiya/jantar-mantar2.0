@@ -1,0 +1,67 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildpath
+.cproject
+.fslckout
+.gdb_history
+.idea/
+.project
+.settings/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Dart related
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Symbol files
+*.js.deps
+*.js.map
+*.snapshot
+
+# Android related
+**/android/app/profile
+**/android/app/release
+**/android/app/debug
+**/android/.gradle/
+**/android/local.properties
+**/android/key.properties
+**/android/app/key.properties
+**/android/app/google-services.json
+
+# iOS / macOS related
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/app.flt
+**/ios/Flutter/ephemeral/
+**/ios/Pods/
+**/ios/Runner.xcworkspace/xcuserdata/
+**/ios/Runner.xcodeproj/project.xcworkspace/xcuserdata/
+**/ios/Runner.xcodeproj/xcuserdata/
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.h
+**/ios/Runner/GeneratedPluginRegistrant.m
+
+**/macos/Flutter/ephemeral/
+**/macos/Pods/
+
+# Linux related
+**/linux/flutter/ephemeral/
+
+# Windows related
+**/windows/flutter/ephemeral/
+
+# Coverage
+coverage/
