@@ -172,6 +172,7 @@ class GameController extends ChangeNotifier {
 
   void startGame() {
     GameAudio.playDeploy();
+    GameAudio.playGameplayBgm();
     isGameOver = false;
     isVictory = false;
     isArrested = false;
@@ -339,6 +340,7 @@ class GameController extends ChangeNotifier {
     camera.setZoom(0.45);
     _initLevel(1);
     _spawnPlayerOnOuterRing();
+    GameAudio.playHomeBgm();
     notifyListeners();
   }
 
