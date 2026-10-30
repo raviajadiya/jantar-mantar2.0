@@ -31,7 +31,7 @@ class GameConfig {
   static const double claimCapDistance = 60.0;
 
   // Zoom bounds
-  static const double minZoom = 0.22;
+  static const double minZoom = 0.15;
   static const double maxZoom = 2.4;
 
   // Headlines

@@ -14,8 +14,8 @@ class GameCamera {
   double targetX = 1800.0;
   double targetY = 1800.0;
 
-  double zoom = 0.85;
-  double targetZoom = 0.85;
+  double zoom = 0.45;
+  double targetZoom = 0.45;
   final double minZoom = GameConfig.minZoom;
   final double maxZoom = GameConfig.maxZoom;
 

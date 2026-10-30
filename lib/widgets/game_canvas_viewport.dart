@@ -58,7 +58,6 @@ class _GameCanvasViewportState extends State<GameCanvasViewport> {
           },
           onTapUp: (details) {
             if (!c.isGameStarted) {
-              c.startGame();
               return;
             }
 

@@ -71,6 +71,9 @@ class GameController extends ChangeNotifier {
     collectParticles.clear();
     confettiParticles.clear();
     isConfettiActive = false;
+    camera.clearFollow();
+    camera.isDragging = false;
+    camera.setZoom(0.45);
 
     // Road network
     roadNetwork.buildGraphForLevel(level);
@@ -192,7 +195,7 @@ class GameController extends ChangeNotifier {
     isGameStarted = true;
     camera.moveTo(playerPos.dx, playerPos.dy);
     camera.setFollow(playerPos);
-    camera.setZoom(0.72);
+    camera.setZoom(0.45);
     notifyListeners();
   }
 
@@ -331,7 +334,11 @@ class GameController extends ChangeNotifier {
     isArrested = false;
     isConfettiActive = false;
     confettiParticles.clear();
+    camera.clearFollow();
+    camera.isDragging = false;
+    camera.setZoom(0.45);
     _initLevel(1);
+    _spawnPlayerOnOuterRing();
     notifyListeners();
   }
 
@@ -671,7 +678,7 @@ class GameController extends ChangeNotifier {
     camera.isDragging = false;
     camera.moveTo(playerPos.dx, playerPos.dy);
     camera.setFollow(playerPos);
-    camera.setZoom(0.85);
+    camera.setZoom(0.45);
     closeZoomDropdown();
     notifyListeners();
   }

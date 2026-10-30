@@ -138,22 +138,17 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
                 // 2. In-Game HUD Elements
                 if (_controller.isGameStarted && !_isHeroCustomizerOpen) ...[
-                  HudTopLeft(controller: _controller),
                   HudTopBar(
                     controller: _controller,
                     onOpenHeroCustomizer: _openHeroCustomizer,
                   ),
-                  HudZoomWidget(
-                    controller: _controller,
-                    onOpenHeroCustomizer: _openHeroCustomizer,
-                  ),
-                  VirtualJoystick(
-                    onDirectionChanged: (dir) {
-                      _joystickDirection = dir;
-                    },
-                    onSprintChanged: (sprint) {
-                      _joystickSprint = sprint;
-                    },
+                  Positioned(
+                    bottom: 24,
+                    right: 20,
+                    child: HudZoomWidget(
+                      controller: _controller,
+                      onOpenHeroCustomizer: _openHeroCustomizer,
+                    ),
                   ),
                 ],
 
