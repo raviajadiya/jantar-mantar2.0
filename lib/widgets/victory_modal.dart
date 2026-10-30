@@ -23,6 +23,9 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
   late AnimationController _swingController;
   late Animation<double> _swingAnimation;
 
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
   int _countdown = 4;
   Timer? _timer;
 
@@ -40,8 +43,19 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
       CurvedAnimation(parent: _swingController, curve: Curves.easeInOut),
     );
 
-    // 2. 4-second Countdown Timer
+    // 2. Pulse Glow Animation for Continue Button
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    // 3. 4-second Countdown Timer
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
       if (_countdown > 1) {
         setState(() {
           _countdown--;
@@ -58,6 +72,7 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
   @override
   void dispose() {
     _swingController.dispose();
+    _pulseController.dispose();
     _timer?.cancel();
     super.dispose();
   }
@@ -65,6 +80,7 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     final c = widget.controller;
+    final nextLevel = c.currentLevel + 1;
 
     return Center(
       child: Container(
@@ -127,11 +143,14 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
             // 4-Second Countdown OR Action Buttons
             if (_countdown > 0) ...[
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E293B),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFF22C55E).withValues(alpha: 0.5), width: 1.5),
+                  border: Border.all(
+                    color: const Color(0xFF22C55E).withValues(alpha: 0.5),
+                    width: 1.5,
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -140,13 +159,13 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
-                        strokeWidth: 2.2,
+                        strokeWidth: 2.5,
                         color: Color(0xFF22C55E),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Unlocking next level in $_countdown s...',
+                      'Unlocking Level $nextLevel in $_countdown s...',
                       style: const TextStyle(
                         color: Color(0xFF86EFAC),
                         fontSize: 13,
@@ -158,48 +177,118 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
               ),
             ] else ...[
               // Action Buttons revealed after 4s
-              Row(
+              Column(
                 children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: widget.onContinue,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF59E0B),
-                        foregroundColor: const Color(0xFF0F172A),
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  // CONTINUE NEXT LEVEL BUTTON (Identical to Home Start Game button!)
+                  AnimatedBuilder(
+                    animation: _pulseAnimation,
+                    builder: (context, child) {
+                      final glowAlpha = 0.4 + _pulseAnimation.value * 0.35;
+                      return Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFF59E0B).withValues(alpha: glowAlpha),
+                              blurRadius: 22,
+                              spreadRadius: 2,
+                            ),
+                          ],
                         ),
-                        elevation: 4,
+                        child: child,
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFF59E0B), Color(0xFFEA580C)],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.35),
+                          width: 1.2,
+                        ),
                       ),
-                      child: const Text(
-                        '▶ CONTINUE NEXT',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.5,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: widget.onContinue,
+                          borderRadius: BorderRadius.circular(16),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.black26,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.play_arrow_rounded,
+                                    color: Colors.white,
+                                    size: 22,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  'CONTINUE TO LEVEL $nextLevel',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15.5,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 1.4,
+                                    shadows: [
+                                      Shadow(
+                                        color: Colors.black45,
+                                        offset: Offset(0, 1.5),
+                                        blurRadius: 3,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
+
+                  const SizedBox(height: 12),
+
+                  // GO TO HOME BUTTON
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
                       onPressed: widget.onHome,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF334155),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1E293B),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 13),
+                        side: const BorderSide(color: Color(0xFF334155), width: 1.5),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Text(
-                        '🏠 GO TO HOME',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('🏠', style: TextStyle(fontSize: 15)),
+                          SizedBox(width: 8),
+                          Text(
+                            'GO TO HOME',
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
