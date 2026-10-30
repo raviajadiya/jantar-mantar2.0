@@ -160,7 +160,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 // 3. Start Game Dialog (or Hero Customizer)
                 if (!_controller.isGameStarted || _isHeroCustomizerOpen)
                   Container(
-                    color: Colors.black.withValues(alpha: 0.65),
+                    color: Colors.black.withValues(alpha: 0.35),
                     child: StartCardDialog(
                       controller: _controller,
                       onStart: () {
