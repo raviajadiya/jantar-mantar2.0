@@ -104,7 +104,7 @@ class _StartCardDialogState extends State<StartCardDialog> with SingleTickerProv
                         Text('💡 ', style: TextStyle(fontSize: 13)),
                         Expanded(
                           child: Text(
-                            'Evade Police, collect flags & reach Gandhi Cap at center!',
+                            'Evade Police, collect flags & reach Golden Trophy at center!',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Color(0xFFCBD5E1),

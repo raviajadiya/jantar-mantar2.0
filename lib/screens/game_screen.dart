@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../engine/game_controller.dart';
 import '../engine/game_audio.dart';
+import '../painters/confetti_painter.dart';
 import '../widgets/game_canvas_viewport.dart';
 import '../widgets/hud_top_bar.dart';
 import '../widgets/hud_zoom_widget.dart';
@@ -165,7 +166,16 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                     ),
                   ),
 
-                // 5. Help & Radar Map Modal
+                // 5. Celebration Confetti (Renders ON TOP of Victory Modal!)
+                if (_controller.isConfettiActive)
+                  IgnorePointer(
+                    child: CustomPaint(
+                      painter: ConfettiPainter(particles: _controller.confettiParticles),
+                      size: MediaQuery.of(context).size,
+                    ),
+                  ),
+
+                // 6. Help & Radar Map Modal
                 if (_controller.isHelpModalOpen)
                   Container(
                     color: Colors.black.withValues(alpha: 0.75),

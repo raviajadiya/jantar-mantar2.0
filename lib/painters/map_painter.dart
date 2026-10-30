@@ -381,7 +381,7 @@ class MapPainter extends CustomPainter {
         Paint()..color = const Color.fromRGBO(245, 158, 11, 0.25),
       );
 
-      // Floating cap
+      // Floating Trophy Cup
       final hoverY = y + math.sin(t * 4) * 6.0;
       canvas.save();
       canvas.translate(x, hoverY);
@@ -389,57 +389,31 @@ class MapPainter extends CustomPainter {
       // Shadow
       canvas.drawOval(
         Rect.fromCenter(
-          center: Offset(0, 16.0 - math.sin(t * 4) * 3.0),
-          width: 36,
+          center: Offset(0, 20.0 - math.sin(t * 4) * 3.0),
+          width: 38,
           height: 12,
         ),
         Paint()..color = const Color.fromRGBO(0, 0, 0, 0.35),
       );
 
-      // White Khadi Gandhi Cap
-      final capPath = Path()
-        ..moveTo(-22, 6)
-        ..quadraticBezierTo(-10, -18, 0, -22)
-        ..quadraticBezierTo(10, -18, 22, 6)
-        ..quadraticBezierTo(0, 10, -22, 6)
-        ..close();
-
-      canvas.drawPath(capPath, Paint()..color = Colors.white);
-      canvas.drawPath(
-        capPath,
-        Paint()
-          ..color = const Color(0xFFD97706)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5,
-      );
-
-      // Central Fold Line
-      canvas.drawLine(
-        const Offset(0, -22),
-        const Offset(0, 8),
-        Paint()
-          ..color = const Color(0xFFCBD5E1)
-          ..strokeWidth = 2.0,
-      );
-
-      // Tricolor ribbon band
-      canvas.drawRect(
-        const Rect.fromLTWH(-18, 4, 36, 2.5),
-        Paint()..color = const Color(0xFFF97316),
-      );
-      canvas.drawRect(
-        const Rect.fromLTWH(-18, 6.5, 36, 2.5),
-        Paint()..color = const Color(0xFF16A34A),
-      );
+      // Golden Trophy Cup
+      final trophyPainter = TextPainter(
+        text: const TextSpan(
+          text: '🏆',
+          style: TextStyle(fontSize: 38),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      trophyPainter.paint(canvas, Offset(-trophyPainter.width / 2, -trophyPainter.height / 2));
 
       // Overhead animated arrow
-      final arrowY = -34.0 + math.sin(t * 6) * 4.0;
+      final arrowY = -42.0 + math.sin(t * 6) * 4.0;
       final textPainter = TextPainter(
         text: const TextSpan(
           text: '⬇',
           style: TextStyle(
             color: Color(0xFFFACC15),
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -449,7 +423,7 @@ class MapPainter extends CustomPainter {
 
       // Label Capsule
       final badgeRect = RRect.fromRectAndRadius(
-        const Rect.fromLTWH(-80, -62, 160, 22),
+        const Rect.fromLTWH(-85, -68, 170, 22),
         const Radius.circular(6),
       );
       canvas.drawRRect(badgeRect, Paint()..color = const Color(0xFF0F172A));
@@ -463,7 +437,7 @@ class MapPainter extends CustomPainter {
 
       final labelPainter = TextPainter(
         text: const TextSpan(
-          text: '★ CLAIM CAP TO WIN! ★',
+          text: '★ CLAIM TROPHY TO WIN! ★',
           style: TextStyle(
             color: Color(0xFFFEF08A),
             fontSize: 10.5,
@@ -472,7 +446,7 @@ class MapPainter extends CustomPainter {
         ),
         textDirection: TextDirection.ltr,
       )..layout();
-      labelPainter.paint(canvas, Offset(-labelPainter.width / 2, -58));
+      labelPainter.paint(canvas, Offset(-labelPainter.width / 2, -64));
 
       canvas.restore();
     } else {
@@ -483,26 +457,27 @@ class MapPainter extends CustomPainter {
       // Altar
       canvas.drawCircle(
         Offset.zero,
-        28.0,
+        30.0,
         Paint()..color = const Color.fromRGBO(15, 23, 42, 0.7),
       );
       canvas.drawCircle(
         Offset.zero,
-        28.0,
+        30.0,
         Paint()
           ..color = const Color.fromRGBO(255, 255, 255, 0.2)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.5,
       );
 
-      // Translucent cap
-      final capPath = Path()
-        ..moveTo(-16, 4)
-        ..quadraticBezierTo(-7, -12, 0, -15)
-        ..quadraticBezierTo(7, -12, 16, 4)
-        ..quadraticBezierTo(0, 7, -16, 4)
-        ..close();
-      canvas.drawPath(capPath, Paint()..color = Colors.white.withValues(alpha: 0.45));
+      // Translucent Trophy
+      final trophyPainter = TextPainter(
+        text: const TextSpan(
+          text: '🏆',
+          style: TextStyle(fontSize: 28),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      trophyPainter.paint(canvas, Offset(-trophyPainter.width / 2, -trophyPainter.height / 2));
 
       // Lock tag
       final tagRect = RRect.fromRectAndRadius(
