@@ -1,14 +1,19 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Audio coordinator with SharedPreferences persistence, smooth transitions & looping
-class GameAudio {
+/// Audio coordinator with SharedPreferences persistence, smooth transitions, looping & App Lifecycle handling
+class GameAudio with WidgetsBindingObserver {
+  static final GameAudio _instance = GameAudio._();
+  GameAudio._();
+
   static final AudioPlayer _bgmPlayer = AudioPlayer();
   static String? _currentBgm;
   static bool _isSoundEnabled = true;
   static bool _isInitialized = false;
+  static bool _isAppPaused = false;
 
   static const String _prefSoundKey = 'is_sound_enabled';
 
@@ -18,10 +23,41 @@ class GameAudio {
     if (_isInitialized) return;
     _isInitialized = true;
     AudioCache.instance.prefix = '';
+    WidgetsBinding.instance.addObserver(_instance);
 
     try {
       final prefs = await SharedPreferences.getInstance();
       _isSoundEnabled = prefs.getBool(_prefSoundKey) ?? true;
+    } catch (_) {}
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      pauseBgm();
+    } else if (state == AppLifecycleState.resumed) {
+      resumeBgm();
+    }
+  }
+
+  static Future<void> pauseBgm() async {
+    _isAppPaused = true;
+    try {
+      if (_bgmPlayer.state == PlayerState.playing) {
+        await _bgmPlayer.pause();
+      }
+    } catch (_) {}
+  }
+
+  static Future<void> resumeBgm() async {
+    _isAppPaused = false;
+    if (!_isSoundEnabled) return;
+    try {
+      if (_bgmPlayer.state == PlayerState.paused && _currentBgm != null) {
+        await _bgmPlayer.resume();
+      }
     } catch (_) {}
   }
 
@@ -34,7 +70,7 @@ class GameAudio {
 
     if (!enabled) {
       await stopBgm();
-    } else {
+    } else if (!_isAppPaused) {
       // Resume current BGM if sound turned on
       final lastBgm = _currentBgm;
       _currentBgm = null;
@@ -52,21 +88,21 @@ class GameAudio {
 
   static Future<void> playHomeBgm() async {
     await init();
-    if (!_isSoundEnabled) return;
+    if (!_isSoundEnabled || _isAppPaused) return;
     if (_currentBgm == 'home.mp3' && _bgmPlayer.state == PlayerState.playing) return;
     await _smoothPlay('sound/home.mp3', 'home.mp3');
   }
 
   static Future<void> playGameplayBgm() async {
     await init();
-    if (!_isSoundEnabled) return;
+    if (!_isSoundEnabled || _isAppPaused) return;
     if (_currentBgm == 'gameplay.mp3' && _bgmPlayer.state == PlayerState.playing) return;
     await _smoothPlay('sound/gameplay.mp3', 'gameplay.mp3');
   }
 
   static Future<void> playGameOverBgm() async {
     await init();
-    if (!_isSoundEnabled) return;
+    if (!_isSoundEnabled || _isAppPaused) return;
     if (_currentBgm == 'game_over.mp3' && _bgmPlayer.state == PlayerState.playing) return;
     await _smoothPlay('sound/game_over.mp3', 'game_over.mp3');
   }
@@ -115,11 +151,11 @@ class GameAudio {
 
       // Smooth Fade In
       for (double v = 0.0; v <= 1.0; v += 0.2) {
-        if (_currentBgm != bgmKey || !_isSoundEnabled) break;
+        if (_currentBgm != bgmKey || !_isSoundEnabled || _isAppPaused) break;
         await _bgmPlayer.setVolume(v.clamp(0.0, 1.0));
         await Future.delayed(const Duration(milliseconds: 30));
       }
-      if (_currentBgm == bgmKey && _isSoundEnabled) {
+      if (_currentBgm == bgmKey && _isSoundEnabled && !_isAppPaused) {
         await _bgmPlayer.setVolume(1.0);
       }
     } catch (_) {}
@@ -139,31 +175,31 @@ class GameAudio {
 
   // Sound effects & Haptics
   static void playHover() {
-    if (_isSoundEnabled) SystemSound.play(SystemSoundType.click);
+    if (_isSoundEnabled && !_isAppPaused) SystemSound.play(SystemSoundType.click);
   }
 
   static void playSelect() {
-    HapticFeedback.selectionClick();
-    if (_isSoundEnabled) SystemSound.play(SystemSoundType.click);
+    if (!_isAppPaused) HapticFeedback.selectionClick();
+    if (_isSoundEnabled && !_isAppPaused) SystemSound.play(SystemSoundType.click);
   }
 
   static void playDeploy() {
-    HapticFeedback.mediumImpact();
+    if (!_isAppPaused) HapticFeedback.mediumImpact();
   }
 
   static void playCollect() {
-    HapticFeedback.lightImpact();
+    if (!_isAppPaused) HapticFeedback.lightImpact();
   }
 
   static void playPoliceSiren() {
-    HapticFeedback.heavyImpact();
+    if (!_isAppPaused) HapticFeedback.heavyImpact();
   }
 
   static void playBlastPop() {
-    HapticFeedback.heavyImpact();
+    if (!_isAppPaused) HapticFeedback.heavyImpact();
   }
 
   static void playFanfare() {
-    HapticFeedback.mediumImpact();
+    if (!_isAppPaused) HapticFeedback.mediumImpact();
   }
 }

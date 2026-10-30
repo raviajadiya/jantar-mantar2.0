@@ -17,7 +17,7 @@ class GameController extends ChangeNotifier {
 
   MapTheme currentTheme = MapThemes.dark;
   CountryFaction selectedCountry = CountryData.countries[0]; // India
-  String playerName = 'Aam Aadmi';
+  String playerName = 'Protester';
 
   // Player State
   Offset playerPos = const Offset(400, 1800);

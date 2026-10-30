@@ -289,7 +289,7 @@ class _StartCardDialogState extends State<StartCardDialog> with SingleTickerProv
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  c.playerName.isEmpty ? 'Aam Aadmi' : c.playerName,
+                  c.playerName.isEmpty ? 'Protester' : c.playerName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(

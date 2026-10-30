@@ -142,7 +142,7 @@ class CountryData {
   ];
 
   static const List<String> randomNames = [
-    'Aam Aadmi',
+    'Protester',
     'Dilli Rebel',
     'Azad Hind',
     'Kisan Sena',
