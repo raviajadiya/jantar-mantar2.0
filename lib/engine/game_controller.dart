@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../constants/game_config.dart';
@@ -51,6 +52,36 @@ class GameController extends ChangeNotifier {
   // UI Modals
   bool isHelpModalOpen = false;
   bool isZoomDropdownOpen = false;
+
+  // Pause & Resume Countdown
+  bool isPaused = false;
+  int resumeCountdown = 0;
+  Timer? _resumeTimer;
+
+  void pauseGame() {
+    isPaused = true;
+    _resumeTimer?.cancel();
+    resumeCountdown = 0;
+    notifyListeners();
+  }
+
+  void startResumeCountdown() {
+    _resumeTimer?.cancel();
+    resumeCountdown = 3;
+    notifyListeners();
+
+    _resumeTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (resumeCountdown > 1) {
+        resumeCountdown--;
+        notifyListeners();
+      } else {
+        resumeCountdown = 0;
+        isPaused = false;
+        _resumeTimer?.cancel();
+        notifyListeners();
+      }
+    });
+  }
 
   GameController() {
     roadNetwork = RoadNetwork();
@@ -175,6 +206,9 @@ class GameController extends ChangeNotifier {
   void startGame() {
     GameAudio.playDeploy();
     GameAudio.playGameplayBgm();
+    isPaused = false;
+    resumeCountdown = 0;
+    _resumeTimer?.cancel();
     isGameOver = false;
     isVictory = false;
     isArrested = false;
@@ -331,6 +365,9 @@ class GameController extends ChangeNotifier {
   }
 
   void goToHome() {
+    isPaused = false;
+    resumeCountdown = 0;
+    _resumeTimer?.cancel();
     isGameOver = false;
     isGameStarted = false;
     isVictory = false;
@@ -431,6 +468,11 @@ class GameController extends ChangeNotifier {
       final camY = roadNetwork.center.dy + math.sin(cinematicAngle * 0.8) * (radius * 0.65);
       camera.moveTo(camX, camY);
       camera.update();
+      notifyListeners();
+      return;
+    }
+
+    if (isPaused || resumeCountdown > 0) {
       notifyListeners();
       return;
     }

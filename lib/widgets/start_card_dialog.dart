@@ -8,11 +8,13 @@ import 'settings_dialog.dart';
 class StartCardDialog extends StatefulWidget {
   final GameController controller;
   final VoidCallback onStart;
+  final ValueChanged<bool>? onModalToggle;
 
   const StartCardDialog({
     super.key,
     required this.controller,
     required this.onStart,
+    this.onModalToggle,
   });
 
   @override
@@ -39,11 +41,19 @@ class _StartCardDialogState extends State<StartCardDialog> with SingleTickerProv
 
   void _openSettings() {
     GameAudio.playSelect();
+    if (widget.onModalToggle != null) {
+      widget.onModalToggle!(true);
+    }
     showDialog(
       context: context,
       builder: (context) => SettingsDialog(controller: widget.controller),
     ).then((_) {
-      setState(() {});
+      if (widget.onModalToggle != null) {
+        widget.onModalToggle!(false);
+      }
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
