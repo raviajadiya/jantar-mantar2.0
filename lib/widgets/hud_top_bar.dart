@@ -5,11 +5,13 @@ import '../engine/game_controller.dart';
 class HudTopBar extends StatelessWidget {
   final GameController controller;
   final VoidCallback onOpenHeroCustomizer;
+  final VoidCallback? onHome;
 
   const HudTopBar({
     super.key,
     required this.controller,
     required this.onOpenHeroCustomizer,
+    this.onHome,
   });
 
   @override
@@ -22,7 +24,7 @@ class HudTopBar extends StatelessWidget {
       right: 16,
       child: Center(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
             color: const Color(0xF20F172A),
             borderRadius: BorderRadius.circular(22),
@@ -44,6 +46,24 @@ class HudTopBar extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Home Button
+                if (onHome != null) ...[
+                  InkWell(
+                    onTap: onHome,
+                    borderRadius: BorderRadius.circular(10),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('🏠', style: TextStyle(fontSize: 15)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  _buildDivider(),
+                ],
+
                 // Player Profile Badge
                 InkWell(
                   onTap: onOpenHeroCustomizer,

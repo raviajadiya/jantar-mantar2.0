@@ -5,11 +5,13 @@ import '../engine/game_controller.dart';
 class HudZoomWidget extends StatelessWidget {
   final GameController controller;
   final VoidCallback onOpenHeroCustomizer;
+  final VoidCallback? onHome;
 
   const HudZoomWidget({
     super.key,
     required this.controller,
     required this.onOpenHeroCustomizer,
+    this.onHome,
   });
 
   @override
@@ -21,7 +23,7 @@ class HudZoomWidget extends StatelessWidget {
         // Dropdown menu panel (Opens upwards)
         if (controller.isZoomDropdownOpen) ...[
           Container(
-            width: 140,
+            width: 145,
             decoration: BoxDecoration(
               color: const Color(0xFA0F172A),
               borderRadius: BorderRadius.circular(14),
@@ -45,11 +47,13 @@ class HudZoomWidget extends StatelessWidget {
                 _buildDropdownItem('➖ Zoom Out', controller.zoomOut),
                 _buildDropdownDivider(),
                 _buildDropdownItem('⊙ Reset View', controller.resetCamera),
-                _buildDropdownDivider(),
-                _buildDropdownItem('⚙️ Settings', () {
-                  controller.closeZoomDropdown();
-                  onOpenHeroCustomizer();
-                }),
+                if (onHome != null) ...[
+                  _buildDropdownDivider(),
+                  _buildDropdownItem('🏠 Go to Home', () {
+                    controller.closeZoomDropdown();
+                    onHome!();
+                  }),
+                ],
               ],
             ),
           ),
