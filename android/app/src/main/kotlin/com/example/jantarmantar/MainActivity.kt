@@ -1,4 +1,4 @@
-package com.example.jantarmantar
+package com.envisiontechnolabs.jantarmantar
 
 import io.flutter.embedding.android.FlutterActivity
 
