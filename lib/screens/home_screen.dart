@@ -5,9 +5,11 @@ import '../engine/game_controller.dart';
 import '../engine/game_audio.dart';
 import '../firebase_config/firebase_notification_service.dart';
 import '../firebase_config/firebase_remote_config.dart';
+import '../firebase_config/notification_storage_service.dart';
 import '../widgets/game_canvas_viewport.dart';
 import '../widgets/start_card_dialog.dart';
 import 'game_screen.dart';
+import 'notification_list_screen.dart';
 
 /// 1. Dedicated Home / Main Menu Screen
 class HomeScreen extends StatefulWidget {
@@ -83,6 +85,25 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       // When returning to HomeScreen, resume Home BGM & reset cinematic view
       GameAudio.playHomeBgm();
       _controller.goToHome();
+      if (mounted) {
+        setState(() {
+          _isModalDialogOpen = false;
+        });
+      }
+    });
+  }
+
+  void _openNotifications() {
+    GameAudio.playSelect();
+    setState(() {
+      _isModalDialogOpen = true;
+    });
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const NotificationListScreen(),
+      ),
+    ).then((_) {
       if (mounted) {
         setState(() {
           _isModalDialogOpen = false;
@@ -226,11 +247,111 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       },
                     ),
                   ),
+
+                // 3. Top-Left Floating Notification Icon
+                if (!_isModalDialogOpen)
+                  Positioned(
+                    top: MediaQuery.paddingOf(context).top + 16,
+                    left: 16,
+                    child: _buildTopLeftNotificationButton(),
+                  ),
               ],
             );
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildTopLeftNotificationButton() {
+    return ValueListenableBuilder<int>(
+      valueListenable: NotificationStorageService.unreadCountNotifier,
+      builder: (context, unreadCount, _) {
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _openNotifications,
+            borderRadius: BorderRadius.circular(24),
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xEB0F172A),
+                border: Border.all(
+                  color: unreadCount > 0
+                      ? const Color(0xFFF59E0B)
+                      : const Color(0xFFF59E0B).withValues(alpha: 0.5),
+                  width: 1.8,
+                ),
+                boxShadow: [
+                  const BoxShadow(
+                    color: Colors.black87,
+                    blurRadius: 16,
+                    offset: Offset(0, 4),
+                  ),
+                  if (unreadCount > 0)
+                    BoxShadow(
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                      blurRadius: 14,
+                      spreadRadius: 1,
+                    ),
+                ],
+              ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: [
+                  Icon(
+                    unreadCount > 0
+                        ? Icons.notifications_active_rounded
+                        : Icons.notifications_rounded,
+                    size: 24,
+                    color: unreadCount > 0
+                        ? const Color(0xFFF59E0B)
+                        : Colors.white,
+                  ),
+                  if (unreadCount > 0)
+                    Positioned(
+                      top: -2,
+                      right: -2,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFF0F172A),
+                            width: 1.8,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFEF4444).withValues(alpha: 0.6),
+                              blurRadius: 6,
+                            ),
+                          ],
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        child: Text(
+                          unreadCount > 9 ? '9+' : '$unreadCount',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
