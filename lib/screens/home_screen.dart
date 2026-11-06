@@ -3,6 +3,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import '../engine/game_controller.dart';
 import '../engine/game_audio.dart';
+import '../firebase_config/firebase_notification_service.dart';
+import '../firebase_config/firebase_remote_config.dart';
 import '../widgets/game_canvas_viewport.dart';
 import '../widgets/start_card_dialog.dart';
 import 'game_screen.dart';
@@ -45,6 +47,22 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     });
 
     _ticker.start();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      // 1. Check for App Updates via Remote Config
+      await FirebaseRemoteConfigService.checkAndShowUpdate(context);
+
+      // 2. Handle pending notification navigation if launched from killed state
+      if (FirebaseNotificationService.pendingOpenUrl != null) {
+        final url = FirebaseNotificationService.pendingOpenUrl!;
+        FirebaseNotificationService.pendingOpenUrl = null;
+        FirebaseNotificationService.launchExternalUrl(url);
+      } else if (FirebaseNotificationService.hasPendingNotificationLaunch) {
+        FirebaseNotificationService.hasPendingNotificationLaunch = false;
+        FirebaseNotificationService.navigateToNotificationList();
+      }
+    });
   }
 
   @override

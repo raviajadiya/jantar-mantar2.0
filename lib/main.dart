@@ -1,8 +1,12 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'firebase_config/firebase_analytics_service.dart';
+import 'firebase_config/firebase_notification_service.dart';
+import 'firebase_config/firebase_remote_config.dart';
 import 'screens/splash_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Full-screen immersive style
@@ -15,6 +19,20 @@ void main() {
     ),
   );
 
+  try {
+    await Firebase.initializeApp();
+    await FirebaseAnalyticsService.initialize();
+    await FirebaseNotificationService.initialize();
+    await FirebaseRemoteConfigService.fetchAndApplyConfig().timeout(
+      const Duration(seconds: 4),
+      onTimeout: () {
+        debugPrint("[RemoteConfig] Config fetch timed out. Proceeding with cached/default.");
+      },
+    );
+  } catch (e) {
+    debugPrint("[Firebase] Initialization error: $e");
+  }
+
   runApp(const JantarMantarApp());
 }
 
@@ -24,6 +42,10 @@ class JantarMantarApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: FirebaseNotificationService.navigatorKey,
+      navigatorObservers: [
+        FirebaseAnalyticsService.instance.observer,
+      ],
       title: 'Jantar Mantar 2.0',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

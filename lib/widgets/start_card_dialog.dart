@@ -2,6 +2,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../engine/game_controller.dart';
 import '../engine/game_audio.dart';
+import '../firebase_config/notification_storage_service.dart';
+import '../screens/notification_list_screen.dart';
 import 'settings_dialog.dart';
 
 /// Compact Arcade Game Start Screen Modal
@@ -47,6 +49,25 @@ class _StartCardDialogState extends State<StartCardDialog> with SingleTickerProv
     showDialog(
       context: context,
       builder: (context) => SettingsDialog(controller: widget.controller),
+    ).then((_) {
+      if (widget.onModalToggle != null) {
+        widget.onModalToggle!(false);
+      }
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  void _openNotifications() {
+    GameAudio.playSelect();
+    if (widget.onModalToggle != null) {
+      widget.onModalToggle!(true);
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const NotificationListScreen(),
+      ),
     ).then((_) {
       if (widget.onModalToggle != null) {
         widget.onModalToggle!(false);
@@ -320,6 +341,68 @@ class _StartCardDialogState extends State<StartCardDialog> with SingleTickerProv
                 ),
               ],
             ),
+          ),
+          const SizedBox(width: 8),
+          // Notification Bell Button
+          ValueListenableBuilder<int>(
+            valueListenable: NotificationStorageService.unreadCountNotifier,
+            builder: (context, unreadCount, _) {
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _openNotifications,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0F172A),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: unreadCount > 0
+                            ? const Color(0xFFF59E0B)
+                            : const Color(0xFF334155),
+                        width: 1.2,
+                      ),
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        const Icon(
+                          Icons.notifications_rounded,
+                          size: 16,
+                          color: Color(0xFFCBD5E1),
+                        ),
+                        if (unreadCount > 0)
+                          Positioned(
+                            top: -6,
+                            right: -6,
+                            child: Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFEF4444),
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 14,
+                                minHeight: 14,
+                              ),
+                              child: Text(
+                                unreadCount > 9 ? '9+' : '$unreadCount',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(width: 8),
           // Settings Gear Button

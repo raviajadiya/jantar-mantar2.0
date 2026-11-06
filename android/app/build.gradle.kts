@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -12,6 +13,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -27,6 +29,7 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -46,4 +49,18 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    implementation("androidx.multidex:multidex:2.0.1")
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+
+    // Firebase dependencies
+    implementation("com.google.firebase:firebase-analytics")
+
+    // WorkManager (fixes WorkDatabase initialization crash with R8 in release)
+    implementation("androidx.work:work-runtime:2.10.0")
 }

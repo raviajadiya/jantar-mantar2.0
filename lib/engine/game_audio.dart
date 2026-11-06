@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../firebase_config/firebase_analytics_service.dart';
 
 /// Audio coordinator with SharedPreferences persistence, smooth transitions, looping & App Lifecycle handling
 class GameAudio with WidgetsBindingObserver {
@@ -63,6 +64,10 @@ class GameAudio with WidgetsBindingObserver {
 
   static Future<void> setSoundEnabled(bool enabled) async {
     _isSoundEnabled = enabled;
+    FirebaseAnalyticsService.instance.logAudioToggled(
+      musicEnabled: enabled,
+      sfxEnabled: enabled,
+    );
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_prefSoundKey, enabled);

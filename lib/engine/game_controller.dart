@@ -10,6 +10,7 @@ import '../models/particle.dart';
 import 'road_network.dart';
 import 'game_camera.dart';
 import 'game_audio.dart';
+import '../firebase_config/firebase_analytics_service.dart';
 
 /// Main State Coordinator & Game Logic Controller
 class GameController extends ChangeNotifier {
@@ -206,6 +207,10 @@ class GameController extends ChangeNotifier {
   void startGame() {
     GameAudio.playDeploy();
     GameAudio.playGameplayBgm();
+    FirebaseAnalyticsService.instance.logGameStarted(
+      playerName: playerName,
+      country: selectedCountry.name,
+    );
     isPaused = false;
     resumeCountdown = 0;
     _resumeTimer?.cancel();
@@ -239,6 +244,9 @@ class GameController extends ChangeNotifier {
   void switchTheme(MapTheme theme) {
     currentTheme = theme;
     GameAudio.playSelect();
+    FirebaseAnalyticsService.instance.logThemeChanged(
+      themeName: theme.name,
+    );
     notifyListeners();
   }
 
@@ -342,6 +350,10 @@ class GameController extends ChangeNotifier {
     isVictory = true;
     GameAudio.playNextLevelSound();
     spawnCelebrationBlast(camera.viewportWidth / 2, camera.viewportHeight / 2);
+    FirebaseAnalyticsService.instance.logGameWon(
+      timeSeconds: animTime,
+      flagsCollected: collectedCount,
+    );
     notifyListeners();
   }
 
@@ -351,6 +363,10 @@ class GameController extends ChangeNotifier {
     arrestingOfficer = officer;
     GameAudio.playPoliceSiren();
     GameAudio.playGameOverBgm();
+    FirebaseAnalyticsService.instance.logGameArrested(
+      timeSeconds: animTime,
+      flagsCollected: collectedCount,
+    );
     notifyListeners();
   }
 
@@ -524,6 +540,10 @@ class GameController extends ChangeNotifier {
             f.isCollected = true;
             _spawnCollectParticles(f.x, f.y, f.stripeColors);
             GameAudio.playCollect();
+            FirebaseAnalyticsService.instance.logFlagCollected(
+              flagCountry: selectedCountry.name,
+              remainingFlags: totalFlagsCount - collectedCount,
+            );
 
             if (areAllFlagsCollected) {
               GameAudio.playFanfare();
