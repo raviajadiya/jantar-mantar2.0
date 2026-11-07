@@ -162,9 +162,9 @@ class GameController extends ChangeNotifier {
     final maxRingIdx = rings.length - 1;
 
     final baseNames = [
-      'Const. Bhati', 'Const. Sharma', 'Const. Gupta', 'SI Verma',
-      'Const. Yadav', 'ACP Malik', 'Insp. Chauhan', 'Const. Singh',
-      'Const. Meena', 'Insp. Rawat', 'Const. Tomar', 'SI Tyagi',
+      'Patrol Unit 01', 'Patrol Unit 02', 'Officer Delta', 'Officer Bravo',
+      'Sector Guard A', 'Sector Guard B', 'Interceptor 01', 'Interceptor 02',
+      'Sentinel Unit', 'Inspector Alpha', 'Patrol Guard 03', 'Circuit Guard',
     ];
 
     for (int i = 0; i < count; i++) {

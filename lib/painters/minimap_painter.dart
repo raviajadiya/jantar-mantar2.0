@@ -7,7 +7,7 @@ import '../models/flag_item.dart';
 import '../models/police_officer.dart';
 import '../models/road_segment.dart';
 
-/// CustomPainter rendering the interactive DILLI MAP radar
+/// CustomPainter rendering the interactive CIRCUIT MAP radar
 class MinimapPainter extends CustomPainter {
   final RoadNetwork roadNetwork;
   final GameCamera camera;

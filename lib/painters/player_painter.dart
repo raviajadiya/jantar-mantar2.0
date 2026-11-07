@@ -3,8 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../constants/country_data.dart';
 
-/// CustomPainter rendering the Protester Player character (Kurta, Nehru jacket,
-/// spectacles, Gandhi cap, bamboo flagpole, and waving country flag banner).
+/// CustomPainter rendering the Protester Player character (Kurta, jacket,
+/// spectacles, protest cap, bamboo flagpole, and waving country flag banner).
 class PlayerPainter extends CustomPainter {
   final Offset position;
   final double angle;
@@ -107,7 +107,7 @@ class PlayerPainter extends CustomPainter {
         ..strokeWidth = 1.0,
     );
 
-    // Nehru Jacket
+    // Vest Jacket
     final jacketPaint = Paint()..color = const Color(0xFF78716C);
     canvas.drawRect(const Rect.fromLTWH(-7, -4, 5, 12), jacketPaint);
     canvas.drawRect(const Rect.fromLTWH(2, -4, 5, 12), jacketPaint);
@@ -123,7 +123,7 @@ class PlayerPainter extends CustomPainter {
     canvas.drawCircle(const Offset(-2.5, -14), 2.5, specsPaint);
     canvas.drawCircle(const Offset(2.5, -14), 2.5, specsPaint);
 
-    // White Gandhi Cap
+    // White Protest Cap
     canvas.drawOval(
       const Rect.fromLTWH(-7.5, -22.5, 15, 7),
       Paint()..color = const Color(0xFFF8FAFC),

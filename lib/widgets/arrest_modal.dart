@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../engine/game_controller.dart';
 
-/// Arrested / Detained dialog when caught by Delhi Police
+/// Arrested / Detained dialog when caught by Patrol Police
 class ArrestModal extends StatelessWidget {
   final GameController controller;
   final VoidCallback onRestart;
@@ -16,7 +16,7 @@ class ArrestModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final officerName = controller.arrestingOfficer?.name ?? 'Delhi Police';
+    final officerName = controller.arrestingOfficer?.name ?? 'Patrol Police';
 
     return Center(
       child: Container(

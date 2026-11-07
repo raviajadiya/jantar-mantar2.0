@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-/// Delhi Police patrol and chase state
+/// Patrol Police patrol and chase state
 class PoliceOfficer {
   final String id;
   final String name;

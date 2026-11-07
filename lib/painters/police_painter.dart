@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../models/police_officer.dart';
 
-/// CustomPainter rendering Delhi Police officers with luminous searchlights,
+/// CustomPainter rendering Patrol Police officers with luminous searchlights,
 /// siren alert fields, khaki uniforms, police caps, and speech bubbles.
 class PolicePainter extends CustomPainter {
   final List<PoliceOfficer> officers;

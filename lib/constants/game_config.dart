@@ -36,11 +36,11 @@ class GameConfig {
 
   // Headlines
   static const List<String> newsHeadlines = [
-    'MISSION: Collect all protest flags on Delhi\'s circular roads before reaching Jantar Mantar!',
-    'POLICE WARNING: Delhi Police patrolling circular roads; stay out of their red vision cone!',
+    'MISSION: Collect all protest flags on the circular roads before reaching Jantar Mantar!',
+    'POLICE WARNING: Patrol Police patrolling circular roads; stay out of their red vision cone!',
     'TIP: If police spot you, break line-of-sight and sprint onto another radial road to lose them!',
     'JANTAR MANTAR CENTER: Reach the Samrat Yantra sundial with all flags to achieve victory!',
-    'DELHI DIARY: Raju Dhaba on Outer Ring is serving cutting chai to escaping protesters',
+    'CIRCUIT DIARY: Waypoint Station on Outer Ring is open to escaping protesters',
     'DHARNA UPDATE: Section 144 imposed on Ring 3; protesters taking Ring 2 detour'
   ];
 }

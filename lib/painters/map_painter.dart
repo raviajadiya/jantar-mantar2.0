@@ -6,7 +6,7 @@ import '../engine/road_network.dart';
 import '../models/road_segment.dart';
 
 /// CustomPainter rendering city blocks, road corridors, curbs, dashed lines,
-/// historical Jantar Mantar instruments and the central Gandhi Cap.
+/// historical Jantar Mantar instruments and the central Victory Cap.
 class MapPainter extends CustomPainter {
   final RoadNetwork roadNetwork;
   final MapTheme theme;
@@ -286,8 +286,8 @@ class MapPainter extends CustomPainter {
     _drawRamYantra(canvas, c.dx + 110, c.dy + 110, 26.0);
     _drawCentralStage(canvas, c.dx - 45, c.dy - 170, 90.0, 36.0);
 
-    // 5. Central Gandhi Protest Cap
-    _drawGandhiCap(canvas, c.dx, c.dy, allFlagsCollected);
+    // 5. Central Victory Cap
+    _drawVictoryCap(canvas, c.dx, c.dy, allFlagsCollected);
   }
 
   void _drawSamratYantra(Canvas canvas, double x, double y) {
@@ -349,7 +349,7 @@ class MapPainter extends CustomPainter {
     canvas.drawRect(Rect.fromLTWH(x, y, w, h), Paint()..color = const Color(0xFFF97316));
   }
 
-  void _drawGandhiCap(Canvas canvas, double x, double y, bool isUnlocked) {
+  void _drawVictoryCap(Canvas canvas, double x, double y, bool isUnlocked) {
     canvas.save();
     final t = animTime;
 

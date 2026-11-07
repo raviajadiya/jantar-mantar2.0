@@ -168,7 +168,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     const SizedBox(height: 8),
 
                     const Text(
-                      'DHARNA MOVEMENT ARCADE • DELHI CIRCUIT',
+                      'DHARNA MOVEMENT ARCADE • CITY CIRCUIT',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Color(0xFF94A3B8),
@@ -202,7 +202,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     const SizedBox(height: 12),
 
                     Text(
-                      'Loading Delhi Map... ${((_loadingProgress * 100).clamp(0, 100)).toInt()}%',
+                      'Loading Game Map... ${((_loadingProgress * 100).clamp(0, 100)).toInt()}%',
                       style: const TextStyle(
                         color: Color(0xFFCBD5E1),
                         fontSize: 11,

@@ -143,16 +143,16 @@ class CountryData {
 
   static const List<String> randomNames = [
     'Protester',
-    'Dilli Rebel',
-    'Azad Hind',
-    'Kisan Sena',
+    'Arcade Rebel',
+    'Freedom Runner',
+    'Circuit Walker',
     'Satyagrahi',
-    'Bharat Veer',
+    'Speed Dasher',
     'Freedom Voice',
     'Inquilab',
     'Metro Commuter',
-    'CP Walker',
-    'Nayi Dilli Guy',
-    'Desh Premi',
+    'Street Walker',
+    'City Runner',
+    'Brave Heart',
   ];
 }

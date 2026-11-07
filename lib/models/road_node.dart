@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-/// Node in the Delhi circular road graph
+/// Node in the circular road graph
 class RoadNode {
   final int id;
   final double x;

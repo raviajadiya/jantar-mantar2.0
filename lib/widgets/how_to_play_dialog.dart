@@ -102,7 +102,7 @@ class HowToPlayDialog extends StatelessWidget {
                         icon: '🚩',
                         badgeColor: const Color(0xFFF59E0B),
                         title: 'COLLECT PROTEST FLAGS',
-                        desc: 'Move across Delhi road intersections and collect all scattered protest flags. Look at the top bar to track remaining flags.',
+                        desc: 'Move across circular road intersections and collect all scattered protest flags. Look at the top bar to track remaining flags.',
                       ),
 
                       const SizedBox(height: 12),
@@ -112,7 +112,7 @@ class HowToPlayDialog extends StatelessWidget {
                         stepNumber: '2',
                         icon: '👮',
                         badgeColor: const Color(0xFFEF4444),
-                        title: 'EVADE DELHI POLICE',
+                        title: 'EVADE PATROL POLICE',
                         desc: 'Police officers actively patrol roads. Stay away from their red vision cone. If caught, you get arrested! You have a 4s grace immunity at level start.',
                       ),
 

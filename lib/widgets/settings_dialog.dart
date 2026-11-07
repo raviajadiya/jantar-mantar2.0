@@ -46,173 +46,183 @@ class _SettingsDialogState extends State<SettingsDialog> {
   @override
   Widget build(BuildContext context) {
     final c = widget.controller;
+    final size = MediaQuery.of(context).size;
+    final dialogWidth = math.min(420.0, size.width * 0.92);
+    final maxHeight = size.height * 0.90;
 
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: Container(
-        width: math.min(420.0, MediaQuery.of(context).size.width * 0.92),
-        decoration: BoxDecoration(
-          color: const Color(0xFB0F172A),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: const Color(0xFF38BDF8).withValues(alpha: 0.6),
-            width: 2.0,
+      child: Center(
+        child: Container(
+          width: dialogWidth,
+          constraints: BoxConstraints(maxHeight: maxHeight),
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: const Color(0xFB0F172A),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: const Color(0xFF38BDF8).withValues(alpha: 0.6),
+              width: 2.0,
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black87,
+                blurRadius: 30,
+                offset: Offset(0, 10),
+              ),
+              BoxShadow(
+                color: Color(0x3338BDF8),
+                blurRadius: 20,
+                spreadRadius: 1,
+              ),
+            ],
           ),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black87,
-              blurRadius: 30,
-              offset: Offset(0, 10),
-            ),
-            BoxShadow(
-              color: Color(0x3338BDF8),
-              blurRadius: 20,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header bar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              decoration: const BoxDecoration(
-                color: Color(0xFF1E293B),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF1E293B),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  border: Border(
+                    bottom: BorderSide(color: Color(0xFF334155), width: 1.5),
+                  ),
                 ),
-                border: Border(
-                  bottom: BorderSide(color: Color(0xFF334155), width: 1.5),
-                ),
-              ),
-              child: Row(
-                children: [
-                  const Text('⚙️', style: TextStyle(fontSize: 22)),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'GAME SETTINGS',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.2,
+                child: Row(
+                  children: [
+                    const Text('⚙️', style: TextStyle(fontSize: 22)),
+                    const SizedBox(width: 10),
+                    const Text(
+                      'GAME SETTINGS',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: () {
-                      GameAudio.playSelect();
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.close_rounded, color: Color(0xFF94A3B8), size: 24),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    tooltip: 'Close',
-                  ),
-                ],
-              ),
-            ),
-
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 1. Audio Sound Toggle
-                  const Text(
-                    'AUDIO SOUND',
-                    style: TextStyle(
-                      color: Color(0xFF94A3B8),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  _buildSoundPills(),
-
-                  const SizedBox(height: 16),
-
-                  // 2. Theme Selection
-                  const Text(
-                    'MAP THEME',
-                    style: TextStyle(
-                      color: Color(0xFF94A3B8),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  _buildThemePills(c),
-
-                  const SizedBox(height: 16),
-
-                  // 3. Player Name
-                  const Text(
-                    'PLAYER HERO NAME',
-                    style: TextStyle(
-                      color: Color(0xFF94A3B8),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  _buildNameInput(c),
-
-                  const SizedBox(height: 16),
-
-                  // 4. Country Faction
-                  const Text(
-                    'FACTION & SPECIAL PERK',
-                    style: TextStyle(
-                      color: Color(0xFF94A3B8),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  _buildCountryDropdown(c),
-
-                  const SizedBox(height: 22),
-
-                  // Done Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
+                    const Spacer(),
+                    IconButton(
                       onPressed: () {
                         GameAudio.playSelect();
                         Navigator.of(context).pop();
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF38BDF8),
-                        foregroundColor: const Color(0xFF0F172A),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        elevation: 4,
-                      ),
-                      child: const Text(
-                        'SAVE & CLOSE',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
+                      icon: const Icon(Icons.close_rounded, color: Color(0xFF94A3B8), size: 24),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      tooltip: 'Close',
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+
+              // Scrollable Content
+              Flexible(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 1. Audio Sound Toggle
+                      const Text(
+                        'AUDIO SOUND',
+                        style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      _buildSoundPills(),
+
+                      const SizedBox(height: 16),
+
+                      // 2. Theme Selection
+                      const Text(
+                        'MAP THEME',
+                        style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      _buildThemePills(c),
+
+                      const SizedBox(height: 16),
+
+                      // 3. Player Name
+                      const Text(
+                        'PLAYER HERO NAME',
+                        style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      _buildNameInput(c),
+
+                      const SizedBox(height: 16),
+
+                      // 4. Country Faction
+                      const Text(
+                        'FACTION & SPECIAL PERK',
+                        style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      _buildCountryDropdown(c),
+
+                      const SizedBox(height: 22),
+
+                      // Done Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            GameAudio.playSelect();
+                            Navigator.of(context).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF38BDF8),
+                            foregroundColor: const Color(0xFF0F172A),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 4,
+                          ),
+                          child: const Text(
+                            'SAVE & CLOSE',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

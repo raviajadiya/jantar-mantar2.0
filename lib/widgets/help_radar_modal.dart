@@ -133,7 +133,7 @@ class HelpRadarModal extends StatelessWidget {
 
                   const SizedBox(height: 6),
                   const Text(
-                    '★ Center: Jantar Mantar (Gandhi Cap)',
+                    '★ Center: Jantar Mantar (Victory Cap)',
                     style: TextStyle(
                       color: Color(0xFFFBBF24),
                       fontSize: 10.5,
@@ -160,12 +160,12 @@ class HelpRadarModal extends StatelessWidget {
                   // 3-Step Guide
                   _buildGuideRow(
                     '1️⃣',
-                    'Collect all Protest Flags while evading Delhi Police patrols.',
+                    'Collect all Protest Flags while evading Patrol Police.',
                   ),
                   const SizedBox(height: 8),
                   _buildGuideRow(
                     '2️⃣',
-                    'After securing all flags, reach the center to claim the Gandhi Cap!',
+                    'After securing all flags, reach the center to claim the Victory Cap!',
                   ),
                   const SizedBox(height: 8),
                   _buildGuideRow(

@@ -120,7 +120,7 @@ class _WorldCompositePainter extends CustomPainter {
     canvas.scale(camera.zoom, camera.zoom);
     canvas.translate(-camera.x, -camera.y);
 
-    // 1. Draw Map (Roads, Blocks, Jantar Mantar instruments & Gandhi Cap)
+    // 1. Draw Map (Roads, Blocks, Jantar Mantar instruments & Victory Cap)
     final mapPainter = MapPainter(
       roadNetwork: controller.roadNetwork,
       theme: controller.currentTheme,
