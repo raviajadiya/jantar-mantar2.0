@@ -136,7 +136,7 @@ class HudTopBar extends StatelessWidget {
                 const SizedBox(width: 8),
 
                 // Threat Status Badge
-                _buildThreatBadge(),
+              //  _buildThreatBadge(),
               ],
             ),
           ),
