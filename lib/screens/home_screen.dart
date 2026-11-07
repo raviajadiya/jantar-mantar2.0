@@ -7,6 +7,7 @@ import '../firebase_config/firebase_notification_service.dart';
 import '../firebase_config/firebase_remote_config.dart';
 import '../firebase_config/notification_storage_service.dart';
 import '../widgets/game_canvas_viewport.dart';
+import '../widgets/how_to_play_dialog.dart';
 import '../widgets/start_card_dialog.dart';
 import 'game_screen.dart';
 import 'notification_list_screen.dart';
@@ -103,6 +104,24 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       MaterialPageRoute(
         builder: (context) => const NotificationListScreen(),
       ),
+    ).then((_) {
+      if (mounted) {
+        setState(() {
+          _isModalDialogOpen = false;
+        });
+      }
+    });
+  }
+
+  void _openHowToPlay() {
+    GameAudio.playSelect();
+    setState(() {
+      _isModalDialogOpen = true;
+    });
+
+    showDialog(
+      context: context,
+      builder: (context) => const HowToPlayDialog(),
     ).then((_) {
       if (mounted) {
         setState(() {
@@ -255,6 +274,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     left: 16,
                     child: _buildTopLeftNotificationButton(),
                   ),
+
+                // 4. Top-Right Floating Help Icon
+                if (!_isModalDialogOpen)
+                  Positioned(
+                    top: MediaQuery.paddingOf(context).top + 16,
+                    right: 16,
+                    child: _buildTopRightHelpButton(),
+                  ),
               ],
             );
           },
@@ -352,6 +379,47 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
         );
       },
+    );
+  }
+
+  Widget _buildTopRightHelpButton() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: _openHowToPlay,
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xEB0F172A),
+            border: Border.all(
+              color: const Color(0xFFF59E0B).withValues(alpha: 0.6),
+              width: 1.8,
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black87,
+                blurRadius: 16,
+                offset: Offset(0, 4),
+              ),
+              BoxShadow(
+                color: Color(0x33F59E0B),
+                blurRadius: 12,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.help_outline_rounded,
+              size: 24,
+              color: Color(0xFFF59E0B),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
