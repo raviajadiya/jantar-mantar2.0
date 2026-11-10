@@ -37,6 +37,7 @@ dependencies:
 
   # Firebase & Cloud Services
   firebase_core: ^4.14.0
+  firebase_auth: ^6.7.0
   firebase_messaging: ^16.6.0
   firebase_remote_config: ^6.6.0
   firebase_analytics: ^12.5.0

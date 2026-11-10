@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'firebase_config/auth_service.dart';
 import 'firebase_config/firebase_analytics_service.dart';
 import 'firebase_config/firebase_notification_service.dart';
 import 'firebase_config/firebase_remote_config.dart';
@@ -21,14 +22,36 @@ void main() async {
 
   try {
     await Firebase.initializeApp();
-    await FirebaseAnalyticsService.initialize();
-    await FirebaseNotificationService.initialize();
-    await FirebaseRemoteConfigService.fetchAndApplyConfig().timeout(
-      const Duration(seconds: 4),
-      onTimeout: () {
-        debugPrint("[RemoteConfig] Config fetch timed out. Proceeding with cached/default.");
-      },
-    );
+
+    // Anonymous Firebase Authentication
+    try {
+      await AuthService.instance.signInAnonymously();
+    } catch (e) {
+      debugPrint("[Auth] Init error: $e");
+    }
+
+    try {
+      await FirebaseAnalyticsService.initialize();
+    } catch (e) {
+      debugPrint("[Analytics] Init error: $e");
+    }
+
+    try {
+      await FirebaseNotificationService.initialize();
+    } catch (e) {
+      debugPrint("[Notification] Init error: $e");
+    }
+
+    try {
+      await FirebaseRemoteConfigService.fetchAndApplyConfig().timeout(
+        const Duration(seconds: 4),
+        onTimeout: () {
+          debugPrint("[RemoteConfig] Config fetch timed out. Proceeding with cached/default.");
+        },
+      );
+    } catch (e) {
+      debugPrint("[RemoteConfig] Init error: $e");
+    }
   } catch (e) {
     debugPrint("[Firebase] Initialization error: $e");
   }

@@ -53,17 +53,21 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      // 1. Check for App Updates via Remote Config
-      await FirebaseRemoteConfigService.checkAndShowUpdate(context);
+      try {
+        // 1. Check for App Updates via Remote Config
+        await FirebaseRemoteConfigService.checkAndShowUpdate(context);
 
-      // 2. Handle pending notification navigation if launched from killed state
-      if (FirebaseNotificationService.pendingOpenUrl != null) {
-        final url = FirebaseNotificationService.pendingOpenUrl!;
-        FirebaseNotificationService.pendingOpenUrl = null;
-        FirebaseNotificationService.launchExternalUrl(url);
-      } else if (FirebaseNotificationService.hasPendingNotificationLaunch) {
-        FirebaseNotificationService.hasPendingNotificationLaunch = false;
-        FirebaseNotificationService.navigateToNotificationList();
+        // 2. Handle pending notification navigation if launched from killed state
+        if (FirebaseNotificationService.pendingOpenUrl != null) {
+          final url = FirebaseNotificationService.pendingOpenUrl!;
+          FirebaseNotificationService.pendingOpenUrl = null;
+          FirebaseNotificationService.launchExternalUrl(url);
+        } else if (FirebaseNotificationService.hasPendingNotificationLaunch) {
+          FirebaseNotificationService.hasPendingNotificationLaunch = false;
+          FirebaseNotificationService.navigateToNotificationList();
+        }
+      } catch (e) {
+        debugPrint("[HomeScreen] PostFrameCallback error: $e");
       }
     });
   }

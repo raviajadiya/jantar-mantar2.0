@@ -34,9 +34,12 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // Signing with the debug keys for now, so `flutter run --release` or release apk works.
             signingConfig = signingConfigs.getByName("debug")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
@@ -60,6 +63,7 @@ dependencies {
 
     // Firebase dependencies
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
 
     // WorkManager (fixes WorkDatabase initialization crash with R8 in release)
     implementation("androidx.work:work-runtime:2.10.0")
