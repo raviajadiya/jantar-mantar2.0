@@ -5,10 +5,18 @@ import 'firebase_config/auth_service.dart';
 import 'firebase_config/firebase_analytics_service.dart';
 import 'firebase_config/firebase_notification_service.dart';
 import 'firebase_config/firebase_remote_config.dart';
+import 'engine/level_storage_service.dart';
 import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load saved level progress before UI initializes
+  try {
+    await LevelStorageService.init();
+  } catch (e) {
+    debugPrint("[LevelStorage] Init error: $e");
+  }
 
   // Full-screen immersive style
   SystemChrome.setSystemUIOverlayStyle(

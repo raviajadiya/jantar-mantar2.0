@@ -2,6 +2,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../engine/game_controller.dart';
 import '../engine/game_audio.dart';
+import '../engine/level_storage_service.dart';
+import 'level_select_dialog.dart';
 import 'settings_dialog.dart';
 
 /// Compact Arcade Game Start Screen Modal
@@ -39,14 +41,14 @@ class _StartCardDialogState extends State<StartCardDialog> with SingleTickerProv
     super.dispose();
   }
 
-  void _openSettings() {
+  void _showModalDialog(Widget dialog) {
     GameAudio.playSelect();
     if (widget.onModalToggle != null) {
       widget.onModalToggle!(true);
     }
     showDialog(
       context: context,
-      builder: (context) => SettingsDialog(controller: widget.controller),
+      builder: (context) => dialog,
     ).then((_) {
       if (widget.onModalToggle != null) {
         widget.onModalToggle!(false);
@@ -56,6 +58,10 @@ class _StartCardDialogState extends State<StartCardDialog> with SingleTickerProv
       }
     });
   }
+
+  void _openSettings() => _showModalDialog(SettingsDialog(controller: widget.controller));
+
+  void _openLevelSelect() => _showModalDialog(LevelSelectDialog(controller: widget.controller));
 
   @override
   Widget build(BuildContext context) {
@@ -100,10 +106,15 @@ class _StartCardDialogState extends State<StartCardDialog> with SingleTickerProv
                     // Profile Summary Bar + Settings Button
                     _buildProfileSettingsBar(c),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
+
+                    // Saved Mission Level Progress Bar + Level Map Selector
+                    _buildLevelProgressBar(c),
+
+                    const SizedBox(height: 14),
 
                     // Big Gaming Start Button
-                    _buildStartButton(),
+                    _buildStartButton(c),
 
                     const SizedBox(height: 12),
 
@@ -357,7 +368,138 @@ class _StartCardDialogState extends State<StartCardDialog> with SingleTickerProv
     );
   }
 
-  Widget _buildStartButton() {
+  Widget _buildLevelProgressBar(GameController c) {
+    final completedCount = LevelStorageService.completedLevelsCount;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFFF59E0B).withValues(alpha: 0.55),
+          width: 1.2,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Star Level Badge
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF0F172A),
+              border: Border.all(color: const Color(0xFFF59E0B), width: 1.5),
+            ),
+            child: const Center(
+              child: Text('⭐', style: TextStyle(fontSize: 16)),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Current Level & Mission Specs
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'LEVEL ${c.currentLevel}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFFFCD34D),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
+                    ),
+                    if (completedCount > 0) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF22C55E).withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: const Color(0xFF22C55E).withValues(alpha: 0.5),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          '✅ $completedCount Done',
+                          style: const TextStyle(
+                            color: Color(0xFF4ADE80),
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '🚩 ${c.totalFlagsCount} Flags • 👮 ${c.officers.length} Patrols',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFFCBD5E1),
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Levels Map Button
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: _openLevelSelect,
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0F172A),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: const Color(0xFFF59E0B).withValues(alpha: 0.65),
+                    width: 1.2,
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Text('🗺️', style: TextStyle(fontSize: 14)),
+                    SizedBox(width: 4),
+                    Text(
+                      'LEVELS',
+                      style: TextStyle(
+                        color: Color(0xFFFBBF24),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStartButton(GameController c) {
+    final unlocked = LevelStorageService.unlockedLevel;
+    final buttonText = (c.currentLevel > 1 && c.currentLevel == unlocked)
+        ? 'CONTINUE LEVEL ${c.currentLevel}'
+        : 'START LEVEL ${c.currentLevel}';
+
     return AnimatedBuilder(
       animation: _pulseAnim,
       builder: (context, child) {
@@ -396,7 +538,7 @@ class _StartCardDialogState extends State<StartCardDialog> with SingleTickerProv
             onTap: widget.onStart,
             borderRadius: BorderRadius.circular(16),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -413,20 +555,25 @@ class _StartCardDialogState extends State<StartCardDialog> with SingleTickerProv
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text(
-                    'START GAME',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.6,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black45,
-                          offset: Offset(0, 1.5),
-                          blurRadius: 3,
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        buttonText,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.4,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black45,
+                              offset: Offset(0, 1.5),
+                              blurRadius: 3,
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ],

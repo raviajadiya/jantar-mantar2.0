@@ -4,6 +4,7 @@ import '../constants/country_data.dart';
 import '../constants/map_themes.dart';
 import '../engine/game_controller.dart';
 import '../engine/game_audio.dart';
+import '../utils/app_review_service.dart';
 
 /// Dedicated Settings & Customizer Modal Dialog
 class SettingsDialog extends StatefulWidget {
@@ -20,6 +21,7 @@ class SettingsDialog extends StatefulWidget {
 
 class _SettingsDialogState extends State<SettingsDialog> {
   late TextEditingController _nameController;
+  bool _isRequestingReview = false;
 
   @override
   void initState() {
@@ -31,6 +33,25 @@ class _SettingsDialogState extends State<SettingsDialog> {
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleRateApp() async {
+    if (_isRequestingReview) return;
+    GameAudio.playSelect();
+    setState(() {
+      _isRequestingReview = true;
+    });
+
+    await AppReviewService.requestInAppReview(
+      source: 'settings',
+      level: widget.controller.currentLevel,
+      fallbackToStore: true,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _isRequestingReview = false;
+    });
   }
 
   void _pickRandomName() {
@@ -188,7 +209,12 @@ class _SettingsDialogState extends State<SettingsDialog> {
                       const SizedBox(height: 6),
                       _buildCountryDropdown(c),
 
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 16),
+
+                      // 5. Rate / In-App Review Button
+                      _buildRateAppButton(),
+
+                      const SizedBox(height: 18),
 
                       // Done Button
                       SizedBox(
@@ -548,6 +574,91 @@ class _SettingsDialogState extends State<SettingsDialog> {
               });
             }
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRateAppButton() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: _isRequestingReview ? null : _handleRateApp,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: const Color(0xFFF59E0B).withValues(alpha: 0.7),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFF59E0B).withValues(alpha: 0.14),
+                blurRadius: 10,
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFFF59E0B).withValues(alpha: 0.16),
+                  border: Border.all(color: const Color(0xFFF59E0B), width: 1.2),
+                ),
+                child: const Center(
+                  child: Text('⭐', style: TextStyle(fontSize: 16)),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'RATE THIS GAME',
+                      style: TextStyle(
+                        color: Color(0xFFFCD34D),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    SizedBox(height: 1),
+                    Text(
+                      'Love playing? Leave a rating & review',
+                      style: TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (_isRequestingReview)
+                const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.2,
+                    color: Color(0xFFF59E0B),
+                  ),
+                )
+              else
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFF59E0B),
+                  size: 22,
+                ),
+            ],
+          ),
         ),
       ),
     );

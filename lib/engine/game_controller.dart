@@ -10,6 +10,7 @@ import '../models/particle.dart';
 import 'road_network.dart';
 import 'game_camera.dart';
 import 'game_audio.dart';
+import 'level_storage_service.dart';
 import '../firebase_config/firebase_analytics_service.dart';
 
 /// Main State Coordinator & Game Logic Controller
@@ -58,6 +59,7 @@ class GameController extends ChangeNotifier {
   bool isPaused = false;
   int resumeCountdown = 0;
   Timer? _resumeTimer;
+  bool _isDisposed = false;
 
   void pauseGame() {
     isPaused = true;
@@ -72,6 +74,10 @@ class GameController extends ChangeNotifier {
     notifyListeners();
 
     _resumeTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_isDisposed) {
+        timer.cancel();
+        return;
+      }
       if (resumeCountdown > 1) {
         resumeCountdown--;
         notifyListeners();
@@ -90,12 +96,32 @@ class GameController extends ChangeNotifier {
       worldWidth: GameConfig.defaultWorldWidth,
       worldHeight: GameConfig.defaultWorldHeight,
     );
-    _initLevel(1);
+    _initLevel(LevelStorageService.unlockedLevel);
     _spawnPlayerOnOuterRing();
+    _syncSavedLevel();
+  }
+
+  Future<void> _syncSavedLevel() async {
+    if (LevelStorageService.isLoaded) return;
+    await LevelStorageService.init();
+    if (_isDisposed || isGameStarted) return;
+    final savedLevel = LevelStorageService.unlockedLevel;
+    if (currentLevel != savedLevel) {
+      _initLevel(savedLevel);
+      _spawnPlayerOnOuterRing();
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _resumeTimer?.cancel();
+    super.dispose();
   }
 
   void _initLevel(int level) {
-    currentLevel = level;
+    currentLevel = math.max(1, level);
     isGameOver = false;
     isVictory = false;
     isArrested = false;
@@ -108,7 +134,7 @@ class GameController extends ChangeNotifier {
     camera.setZoom(0.52);
 
     // Road network
-    roadNetwork.buildGraphForLevel(level);
+    roadNetwork.buildGraphForLevel(currentLevel);
 
     // World size
     final maxR = roadNetwork.rings.last;
@@ -125,14 +151,13 @@ class GameController extends ChangeNotifier {
 
   void _initFlags() {
     flags.clear();
-    final count = 4 + currentLevel * 2;
-
     final validNodes = roadNetwork.nodes.where((n) {
       return !n.isCenter && n.ringIndex >= 1 && n.isIntersection;
     }).toList();
 
     if (validNodes.isEmpty) return;
 
+    final count = math.min<int>(validNodes.length, 4 + currentLevel * 2);
     final step = math.max(1, validNodes.length ~/ count);
 
     for (int i = 0; i < count; i++) {
@@ -156,6 +181,14 @@ class GameController extends ChangeNotifier {
   void _initPolice() {
     officers.clear();
     final count = math.min<int>(18, 8 + (currentLevel - 1) * 2);
+    final patrolSpeed = math.min<double>(
+      135.0,
+      GameConfig.policePatrolSpeed + (currentLevel - 1) * 4.0,
+    );
+    final chaseSpeed = math.min<double>(
+      195.0,
+      GameConfig.policeChaseSpeed + (currentLevel - 1) * 4.0,
+    );
     final rings = roadNetwork.rings;
     final radials = roadNetwork.radials;
     final center = roadNetwork.center;
@@ -184,6 +217,8 @@ class GameController extends ChangeNotifier {
         x: x,
         y: y,
         angle: angle,
+        speed: patrolSpeed,
+        chaseSpeed: chaseSpeed,
         patrolType: (i % 2 == 0) ? 'ring' : 'radial',
         ringIdx: ringIdx,
         spokeIdx: radIdx,
@@ -210,6 +245,7 @@ class GameController extends ChangeNotifier {
     FirebaseAnalyticsService.instance.logGameStarted(
       playerName: playerName,
       country: selectedCountry.name,
+      level: currentLevel,
     );
     isPaused = false;
     resumeCountdown = 0;
@@ -350,7 +386,9 @@ class GameController extends ChangeNotifier {
     isVictory = true;
     GameAudio.playNextLevelSound();
     spawnCelebrationBlast(camera.viewportWidth / 2, camera.viewportHeight / 2);
+    LevelStorageService.markLevelCompleted(currentLevel);
     FirebaseAnalyticsService.instance.logGameWon(
+      level: currentLevel,
       timeSeconds: animTime,
       flagsCollected: collectedCount,
     );
@@ -364,6 +402,7 @@ class GameController extends ChangeNotifier {
     GameAudio.playPoliceSiren();
     GameAudio.playGameOverBgm();
     FirebaseAnalyticsService.instance.logGameArrested(
+      level: currentLevel,
       timeSeconds: animTime,
       flagsCollected: collectedCount,
     );
@@ -380,6 +419,14 @@ class GameController extends ChangeNotifier {
     startGame();
   }
 
+  void selectLevel(int level) {
+    final safeLevel = level.clamp(1, LevelStorageService.unlockedLevel);
+    _initLevel(safeLevel);
+    _spawnPlayerOnOuterRing();
+    GameAudio.playSelect();
+    notifyListeners();
+  }
+
   void goToHome() {
     isPaused = false;
     resumeCountdown = 0;
@@ -393,7 +440,7 @@ class GameController extends ChangeNotifier {
     camera.clearFollow();
     camera.isDragging = false;
     camera.setZoom(0.52);
-    _initLevel(1);
+    _initLevel(LevelStorageService.unlockedLevel);
     _spawnPlayerOnOuterRing();
     GameAudio.playHomeBgm();
     notifyListeners();

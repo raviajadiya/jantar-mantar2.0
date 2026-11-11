@@ -41,9 +41,14 @@
 -keep class com.google.crypto.tink.** { *; }
 -dontwarn com.google.crypto.tink.**
 
-# Play Core (deferred components reference in Flutter engine)
+# Play Core & In-App Review
+-keep class com.google.android.play.core.review.** { *; }
+-keep class com.google.android.play.core.common.** { *; }
+-keep class com.google.android.play.core.tasks.** { *; }
+-keep class dev.britannio.in_app_review.** { *; }
 -dontwarn com.google.android.play.core.**
 -dontwarn com.google.android.play.core.splitcompat.**
 -dontwarn com.google.android.play.core.splitinstall.**
 -dontwarn com.google.android.play.core.tasks.**
+-dontwarn dev.britannio.in_app_review.**
 

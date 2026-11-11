@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../engine/game_controller.dart';
+import '../engine/level_storage_service.dart';
+import '../utils/app_review_service.dart';
 
 /// Level victory dialog with animated trophy and 4-second button unlock countdown
 class VictoryModal extends StatefulWidget {
@@ -28,6 +31,22 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
 
   int _countdown = 4;
   Timer? _timer;
+  bool _isContinuing = false;
+
+  Future<void> _handleContinue() async {
+    if (_isContinuing) return;
+    setState(() {
+      _isContinuing = true;
+    });
+
+    await AppReviewService.requestInAppReview(
+      source: 'next_level',
+      level: widget.controller.currentLevel,
+    );
+
+    if (!mounted) return;
+    widget.onContinue();
+  }
 
   @override
   void initState() {
@@ -81,10 +100,14 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
   Widget build(BuildContext context) {
     final c = widget.controller;
     final nextLevel = c.currentLevel + 1;
+    final unlockedLevel = LevelStorageService.unlockedLevel;
+    final savedText = unlockedLevel > nextLevel
+        ? '💾 Progress Saved • Unlocked: Level $unlockedLevel'
+        : '💾 Level $nextLevel Progress Saved!';
 
     return Center(
       child: Container(
-        width: 380,
+        width: math.min(380.0, MediaQuery.of(context).size.width * 0.90),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
         decoration: BoxDecoration(
           color: const Color(0xF50F172A),
@@ -138,7 +161,30 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
+
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF052E16).withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: const Color(0xFF22C55E).withValues(alpha: 0.55),
+                  width: 1.2,
+                ),
+              ),
+              child: Text(
+                savedText,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF86EFAC),
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
 
             // 4-Second Countdown OR Action Buttons
             if (_countdown > 0) ...[
@@ -164,12 +210,14 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Text(
-                      'Unlocking Level $nextLevel in $_countdown s...',
-                      style: const TextStyle(
-                        color: Color(0xFF86EFAC),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
+                    Flexible(
+                      child: Text(
+                        'Unlocking Level $nextLevel in $_countdown s...',
+                        style: const TextStyle(
+                          color: Color(0xFF86EFAC),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ],
@@ -215,10 +263,10 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
                       child: Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          onTap: widget.onContinue,
+                          onTap: _isContinuing ? null : _handleContinue,
                           borderRadius: BorderRadius.circular(16),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 14),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -228,27 +276,41 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
                                     color: Colors.black26,
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(
-                                    Icons.play_arrow_rounded,
-                                    color: Colors.white,
-                                    size: 22,
-                                  ),
+                                  child: _isContinuing
+                                      ? const SizedBox(
+                                          width: 22,
+                                          height: 22,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.play_arrow_rounded,
+                                          color: Colors.white,
+                                          size: 22,
+                                        ),
                                 ),
                                 const SizedBox(width: 10),
-                                Text(
-                                  'CONTINUE TO LEVEL $nextLevel',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15.5,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1.4,
-                                    shadows: [
-                                      Shadow(
-                                        color: Colors.black45,
-                                        offset: Offset(0, 1.5),
-                                        blurRadius: 3,
+                                Flexible(
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'CONTINUE TO LEVEL $nextLevel',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 15.5,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.4,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.black45,
+                                            offset: Offset(0, 1.5),
+                                            blurRadius: 3,
+                                          ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -265,7 +327,7 @@ class _VictoryModalState extends State<VictoryModal> with TickerProviderStateMix
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
-                      onPressed: widget.onHome,
+                      onPressed: _isContinuing ? null : widget.onHome,
                       style: OutlinedButton.styleFrom(
                         backgroundColor: const Color(0xFF1E293B),
                         foregroundColor: Colors.white,

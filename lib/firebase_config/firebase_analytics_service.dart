@@ -57,6 +57,7 @@ class FirebaseAnalyticsService {
   // 3. User Preferences & Settings
   static const String eventThemeChanged = 'theme_changed';
   static const String eventAudioToggled = 'audio_toggled';
+  static const String eventInAppReviewTriggered = 'in_app_review_triggered';
 
   // ===========================================================================
   // GENERIC LOGGER
@@ -152,12 +153,14 @@ class FirebaseAnalyticsService {
   Future<void> logGameStarted({
     required String playerName,
     required String country,
+    int level = 1,
   }) async {
     await logEvent(
       name: eventGameStarted,
       parameters: {
         'player_name': playerName,
         'country': country,
+        'level': level,
       },
     );
   }
@@ -165,10 +168,12 @@ class FirebaseAnalyticsService {
   Future<void> logGameWon({
     required double timeSeconds,
     required int flagsCollected,
+    int level = 1,
   }) async {
     await logEvent(
       name: eventGameWon,
       parameters: {
+        'level': level,
         'time_seconds': double.parse(timeSeconds.toStringAsFixed(1)),
         'flags_collected': flagsCollected,
       },
@@ -178,10 +183,12 @@ class FirebaseAnalyticsService {
   Future<void> logGameArrested({
     required double timeSeconds,
     required int flagsCollected,
+    int level = 1,
   }) async {
     await logEvent(
       name: eventGameArrested,
       parameters: {
+        'level': level,
         'time_seconds': double.parse(timeSeconds.toStringAsFixed(1)),
         'flags_collected': flagsCollected,
       },
@@ -221,6 +228,19 @@ class FirebaseAnalyticsService {
       parameters: {
         'music_enabled': musicEnabled ? 1 : 0,
         'sfx_enabled': sfxEnabled ? 1 : 0,
+      },
+    );
+  }
+
+  Future<void> logInAppReviewTriggered({
+    required String source,
+    int? level,
+  }) async {
+    await logEvent(
+      name: eventInAppReviewTriggered,
+      parameters: {
+        'source': source,
+        'level': ?level,
       },
     );
   }

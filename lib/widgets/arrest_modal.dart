@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../engine/game_controller.dart';
 
@@ -20,7 +21,7 @@ class ArrestModal extends StatelessWidget {
 
     return Center(
       child: Container(
-        width: 380,
+        width: math.min(380.0, MediaQuery.of(context).size.width * 0.90),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
         decoration: BoxDecoration(
           color: const Color(0xF50F172A),
@@ -59,7 +60,24 @@ class ArrestModal extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E293B),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFF334155), width: 1.2),
+              ),
+              child: Text(
+                '⭐ LEVEL ${controller.currentLevel}  •  🚩 ${controller.collectedCount}/${controller.totalFlagsCount} Flags',
+                style: const TextStyle(
+                  color: Color(0xFFFCD34D),
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 22),
             Row(
               children: [
                 Expanded(
@@ -68,16 +86,19 @@ class ArrestModal extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFEF4444),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text(
-                      '🔄 RESTART GAME',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        '🔄 RETRY LEVEL ${controller.currentLevel}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),
@@ -89,16 +110,19 @@ class ArrestModal extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF334155),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text(
-                      '🏠 GO TO HOME',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        '🏠 GO TO HOME',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
